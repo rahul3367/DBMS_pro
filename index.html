@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Event Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+    </style>
+</head>
+<body class="w-full min-h-screen">
+
+    <!-- Login Container -->
+    <div id="login-container" class="flex items-center justify-center min-h-screen p-4">
+        <div class="w-full max-w-md bg-white p-8 rounded-xl shadow-xl text-center">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">College Event Management</h1>
+            <p class="text-gray-600 mb-8">Please log in to continue</p>
+            <div class="space-y-4">
+                <button onclick="loginAs('admin')" class="w-full bg-indigo-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150">
+                    Login as Admin
+                </button>
+                <button onclick="loginAs('student')" class="w-full bg-gray-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-150">
+                    Login as Student
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Container -->
+    <div id="dashboard-container" class="hidden">
+        <!-- Header -->
+        <header class="bg-white shadow-md">
+            <div class="container mx-auto max-w-7xl px-6 py-4 flex justify-between items-center">
+                <h1 class="text-2xl font-bold text-gray-800">Event Dashboard</h1>
+                <div class="flex items-center space-x-4">
+                    <span id="welcome-message" class="text-gray-600 font-medium"></span>
+                    <button onclick="logout()" class="text-sm font-medium text-indigo-600 hover:text-indigo-800">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="container mx-auto max-w-7xl p-6">
+            
+            <!-- Admin Analytics (Module 4.3.6) -->
+            <div id="admin-stats" class="hidden grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h2 class="text-sm font-medium text-gray-500">Total Events</h2>
+                    <p id="stats-events" class="text-3xl font-semibold text-gray-900">0</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h2 class="text-sm font-medium text-gray-500">Total Participants</h2>
+                    <p id="stats-participants" class="text-3xl font-semibold text-gray-900">0</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h2 class="text-sm font-medium text-gray-500">Events This Month</h2>
+                    <p id="stats-month" class="text-3xl font-semibold text-gray-900">0</p>
+                </div>
+            </div>
+
+            <!-- Main Content Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <!-- Left Column (Events List) -->
+                <div class="lg:col-span-2 space-y-8">
+                    <!-- Admin Create Event Form (Module 4.3.2) -->
+                    <div id="admin-create-form" class="hidden bg-white p-6 rounded-xl shadow-md">
+                        <h2 class="text-xl font-semibold mb-4 text-gray-800">Create New Event</h2>
+                        <form id="form-create-event" class="space-y-4">
+                            <div>
+                                <label for="event-name" class="block text-sm font-medium text-gray-700">Event Name</label>
+                                <input type="text" id="event-name" placeholder="e.g., Technovate 2025" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label for="event-date" class="block text-sm font-medium text-gray-700">Date</label>
+                                    <input type="date" id="event-date" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
+                                </div>
+                                <div>
+                                    <label for="event-venue" class="block text-sm font-medium text-gray-700">Venue</label>
+                                    <input type="text" id="event-venue" placeholder="e.g., Auditorium" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
+                                </div>
+                            </div>
+                            <div>
+                                <label for="event-desc" class="block text-sm font-medium text-gray-700">Description</label>
+                                <textarea id="event-desc" rows="3" placeholder="Short description of the event..." class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                            </div>
+                            <button type="submit" class="w-full bg-indigo-600 text-white font-semibold py-2 px-4 rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                Create Event
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Upcoming Events (Module 4.3.4) -->
+                    <div class="bg-white rounded-xl shadow-md">
+                         <h2 class="text-xl font-semibold p-6 text-gray-800">Upcoming Events</h2>
+                         <div id="events-list" class="divide-y divide-gray-200">
+                            <!-- Event items will be injected here by JS -->
+                         </div>
+                    </div>
+                </div>
+
+                <!-- Right Column (Student's Passes) -->
+                <div id="student-sidebar" class="hidden lg:col-span-1 space-y-8">
+                    <div class="bg-white p-6 rounded-xl shadow-md">
+                        <h2 class="text-xl font-semibold mb-4 text-gray-800">My Registered Events</h2>
+                        <div id="student-my-events" class="space-y-4">
+                            <p class="text-gray-500 text-sm">You haven't registered for any events yet.</p>
+                            <!-- Registered event passes will be injected here by JS -->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- QR Code Modal (Module 4.3.3) -->
+    <div id="qr-modal" class="fixed inset-0 bg-gray-600 bg-opacity-75 overflow-y-auto h-full w-full hidden z-50 flex items-center justify-center p-4">
+        <div class="relative mx-auto p-8 border w-full max-w-md shadow-lg rounded-xl bg-white text-center">
+            <h3 id="modal-title" class="text-2xl leading-6 font-bold text-gray-900 mb-2"></h3>
+            <p class="text-gray-600 mb-4">Scan this QR code at the event entry.</p>
+            <div class="flex justify-center mb-4">
+                <img id="modal-qr-image" src="https://placehold.co/256x256/000000/FFFFFF?text=QR+CODE" alt="Event QR Code" class="rounded-lg shadow-inner">
+            </div>
+            <p id="modal-event-id" class="text-xs text-gray-400 font-mono"></p>
+            <div class="mt-6">
+                <button id="modal-close" onclick="closeQRModal()" class="px-6 py-2 bg-indigo-600 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- DATABASE SIMULATION ---
+            // Simulating the MySQL database with JavaScript objects
+            let db = {
+                events: [
+                    { id: 'evt001', name: 'Technovate 2025', date: '2025-11-15', venue: 'Auditorium', desc: 'Annual tech fest.' },
+                    { id: 'evt002', name: 'CodeSprint Hackathon', date: '2025-11-20', venue: 'Lab 301', desc: '24-hour coding competition.' },
+                    { id: 'evt003', name: 'E-Sports Carnival', date: '2025-11-22', venue: 'Main Ground', desc: 'Gaming tournament.' }
+                ],
+                users: {
+                    admin: { name: 'Admin', role: 'admin' },
+                    student: { name: 'Rahul Singh', role: 'student', registeredEvents: ['evt003'] } // Pre-registered for one
+                },
+                registrations: [
+                    { userId: 'student', eventId: 'evt003' }
+                ]
+            };
+
+            let currentUser = null;
+
+            // --- DOM Elements ---
+            const loginContainer = document.getElementById('login-container');
+            const dashboardContainer = document.getElementById('dashboard-container');
+            const welcomeMessage = document.getElementById('welcome-message');
+            const adminStats = document.getElementById('admin-stats');
+            const adminCreateForm = document.getElementById('admin-create-form');
+            const studentSidebar = document.getElementById('student-sidebar');
+            const eventsList = document.getElementById('events-list');
+            const myEventsList = document.getElementById('student-my-events');
+            const createEventForm = document.getElementById('form-create-event');
+            const modal = document.getElementById('qr-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalEventId = document.getElementById('modal-event-id');
+            const modalQrImage = document.getElementById('modal-qr-image');
+
+            // --- CORE FUNCTIONS ---
+
+            window.loginAs = (role) => {
+                currentUser = db.users[role];
+                loginContainer.classList.add('hidden');
+                dashboardContainer.classList.remove('hidden');
+                renderDashboard(role);
+            };
+
+            window.logout = () => {
+                currentUser = null;
+                loginContainer.classList.remove('hidden');
+                dashboardContainer.classList.add('hidden');
+            };
+
+            function renderDashboard(role) {
+                welcomeMessage.textContent = `Welcome, ${currentUser.name}`;
+                
+                // Reset all views
+                adminStats.classList.add('hidden');
+                adminCreateForm.classList.add('hidden');
+                studentSidebar.classList.add('hidden');
+
+                if (role === 'admin') {
+                    adminStats.classList.remove('hidden');
+                    adminCreateForm.classList.remove('hidden');
+                    renderAdminStats();
+                } else if (role === 'student') {
+                    studentSidebar.classList.remove('hidden');
+                    renderMyEvents();
+                }
+                
+                renderEventList(role);
+            }
+
+            function renderAdminStats() {
+                document.getElementById('stats-events').textContent = db.events.length;
+                document.getElementById('stats-participants').textContent = db.registrations.length;
+                // Simple logic for "this month"
+                const thisMonth = new Date().getMonth();
+                const monthEvents = db.events.filter(e => new Date(e.date).getMonth() === thisMonth).length;
+                document.getElementById('stats-month').textContent = monthEvents;
+            }
+
+            function renderEventList(role) {
+                eventsList.innerHTML = '';
+                if(db.events.length === 0) {
+                    eventsList.innerHTML = '<p class="p-6 text-gray-500">No events created yet.</p>';
+                    return;
+                }
+                
+                db.events.forEach(event => {
+                    let buttonHtml = '';
+                    if (role === 'admin') {
+                        buttonHtml = `<button class="text-sm font-medium text-red-600 hover:text-red-800" onclick="alert('Delete ${event.id}')">Delete</button>`;
+                    } else if (role === 'student') {
+                        const isRegistered = currentUser.registeredEvents.includes(event.id);
+                        if (isRegistered) {
+                            buttonHtml = `<span class="text-sm font-medium text-green-600">Registered</span>`;
+                        } else {
+                            buttonHtml = `<button onclick="handleRegisterClick('${event.id}')" class="text-sm font-medium text-indigo-600 hover:text-indigo-800">Register</button>`;
+                        }
+                    }
+
+                    eventsList.innerHTML += `
+                        <div class="p-6 flex items-center justify-between hover:bg-gray-50">
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-800">${event.name}</h3>
+                                <p class="text-sm text-gray-500">${new Date(event.date).toDateString()} - ${event.venue}</p>
+                                <p class="text-sm text-gray-600 mt-1">${event.desc}</p>
+                            </div>
+                            <div class="flex-shrink-0 ml-4">
+                                ${buttonHtml}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            function renderMyEvents() {
+                myEventsList.innerHTML = '';
+                const myRegisteredEvents = db.events.filter(event => currentUser.registeredEvents.includes(event.id));
+                
+                if(myRegisteredEvents.length === 0) {
+                    myEventsList.innerHTML = '<p class="text-gray-500 text-sm">You haven\'t registered for any events yet.</p>';
+                    return;
+                }
+
+                myRegisteredEvents.forEach(event => {
+                    myEventsList.innerHTML += `
+                        <div onclick="showQRModal('${event.name}', '${event.id}')" class="p-4 border border-gray-200 rounded-lg shadow-sm hover:shadow-md cursor-pointer transition">
+                            <h4 class="font-semibold text-gray-800">${event.name}</h4>
+                            <p class="text-sm text-gray-500">${new Date(event.date).toDateString()}</p>
+                            <span class="text-xs font-medium text-indigo-600">Click to show QR Pass</span>
+                        </div>
+                    `;
+                });
+            }
+
+            // --- EVENT HANDLERS ---
+
+            window.handleRegisterClick = (eventId) => {
+                if (!currentUser.registeredEvents.includes(eventId)) {
+                    currentUser.registeredEvents.push(eventId);
+                    db.registrations.push({ userId: currentUser.role, eventId: eventId });
+                }
+                // Re-render dashboard to show changes
+                renderDashboard('student');
+            };
+
+            createEventForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const newEvent = {
+                    id: 'evt' + Math.floor(Math.random() * 1000),
+                    name: document.getElementById('event-name').value,
+                    date: document.getElementById('event-date').value,
+                    venue: document.getElementById('event-venue').value,
+                    desc: document.getElementById('event-desc').value,
+                };
+                db.events.push(newEvent);
+                renderDashboard('admin');
+                createEventForm.reset();
+            });
+
+            window.showQRModal = (eventName, eventId) => {
+                modalTitle.textContent = eventName;
+                modalEventId.textContent = `EventID: ${eventId}`;
+                // Simulate unique QR for each event
+                const qrText = `EVENT:${eventId}|USER:${currentUser.name}`;
+                modalQrImage.src = `https://placehold.co/256x256/000000/FFFFFF?text=${encodeURIComponent(qrText)}`;
+                modal.classList.remove('hidden');
+            };
+
+            window.closeQRModal = () => {
+                modal.classList.add('hidden');
+            };
+
+        });
+    </script>
+</body>
+</html>
